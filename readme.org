@@ -105,42 +105,25 @@ exercism download -t emacs-lisp -e allergies
 *** Code
 #+begin_src elisp :tangle exercism/emacs-lisp/allergies/allergies.el
 ;;; allergies.el --- Allergies Exercise (exercism)  -*- lexical-binding: t; -*-
-
-(defun allergy-score-bucket (score)
-  "Returns largest individual score presented by SCORE"
-  (let ((pos 0))
-    (while (<=  (expt 2 pos) score)
-      (setq pos (1+ pos)))
-    (expt 2 (1- pos))))
+(defun allergy--score-mask (score values)
+  "Uses SCORE as a bit mask to filter VALUES (LSB first). Return resulting list"
+  (let ((bit-mask 1)
+        (result))
+    (dolist (v values (nreverse result))
+      (when (> (logand score bit-mask) 0) (setq result (cons v result)))
+      (setq bit-mask (lsh bit-mask 1)))))
 
 (defun allergen-list (score)
-  "List all allergens with a given SCORE."
-
-  (let ((allergy-map '((1 . "eggs")
-                       (2 . "peanuts")
-                       (4 . "shellfish")
-                       (8 . "strawberries")
-                       (16 . "tomatoes")
-                       (32 . "chocolate")
-                       (64 . "pollen")
-                       (128 . "cats")))
-        (allergies)                                 ; list of allergies defined by score
-        (bucket 0)                                  ; largest individual included in a score
-        (found-allergy)                             ; cell of allergy found
-        (remaining-score score))                    ; working remaining score variable
-    
-    (setq bucket (allergy-score-bucket score))
-    
-    (while (> remaining-score 0)
-      (if (setq found-allergy (assoc bucket allergy-map))
-          (if allergies
-              (nconc allergies (list (cdr found-allergy)))
-            (setq allergies (list (cdr found-allergy)))))
-      
-      (setq remaining-score (- remaining-score bucket)
-            bucket (allergy-score-bucket remaining-score)))
-    
-    (nreverse allergies)))
+  "Returns list of allergies as defined by allergy SCORE (integer)"
+  (let ((list-of-allergies '("eggs"
+                             "peanuts"
+                             "shellfish"
+                             "strawberries"
+                             "tomatoes"
+                             "chocolate"
+                             "pollen"
+                             "cats")))
+    (allergy--score-mask score list-of-allergies)))
 
 (defun allergic-to-p (score allergen)
   "Returns t if SCORE includes allergen ALLERGEN"
