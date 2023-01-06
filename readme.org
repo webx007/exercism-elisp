@@ -91,43 +91,7 @@ cd ${workspace}/${track}/acronym
 emacs -batch -l ert -l acronym-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/acronym/acronym-test.el
-;;; acronym-test.el --- Tests for Acronym (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code
-
-(load-file "acronym.el")
-(declare-function acronym "acronym.el" (phrase))
-
-(ert-deftest basic ()
-  (should (equal "PNG" (acronym "Portable Network Graphics"))))
-
-(ert-deftest lowercase-words ()
-  (should (equal "ROR" (acronym "Ruby on Rails"))))
-
-(ert-deftest punctuation ()
-  (should (equal "FIFO" (acronym "First In, First Out"))))
-
-(ert-deftest all-caps-words ()
-  (should (equal "PHP" (acronym "PHP: Hypertext Preprocessor"))))
-
-(ert-deftest non-acronym-all-caps-word ()
-  (should (equal "GIMP" (acronym "GNU Image Manipulation Program"))))
-
-(ert-deftest hyphenated ()
-  (should (equal "CMOS" (acronym "Complementary metal-oxide semiconductor"))))
-
-(provide 'acronym-test)
-;;; acronym-test.el ends here
-
-#+end_src
-
 ** Allergies
-:PROPERTIES:
-:ID:       296cba6c-b148-4e59-a8d0-dd45b16451be
-:END:
 Given a person's allergy score, determine whether or not they're allergic to a given item, and their full list of allergies.
 #+begin_src shell
 exercism download -t emacs-lisp -e allergies
@@ -192,68 +156,6 @@ exercism download -t emacs-lisp -e allergies
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/allergies
 emacs -batch -l ert -l allergies-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+begin_src elisp :tangle exercism/emacs-lisp/allergies/allergies-test.el
-;;; allergies-test.el --- Tests for Allergies (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "allergies.el")
-(declare-function allergen-list "allergies.el" (score))
-(declare-function allergic-to-p "allergies.el" (score allergen))
-
-(ert-deftest no-allergies-at-all ()
-  (should (equal '() (allergen-list 0))))
-
-(ert-deftest allergic-to-just-eggs ()
-  (should (equal '("eggs") (allergen-list 1))))
-
-(ert-deftest allergic-to-just-peanuts ()
-  (should (equal '("peanuts") (allergen-list 2))))
-
-(ert-deftest allergic-to-just-strawberries ()
-  (should (equal '("strawberries") (allergen-list 8))))
-
-(ert-deftest allergic-to-eggs-and-peanuts ()
-  (should (equal '("eggs" "peanuts") (allergen-list 3))))
-
-(ert-deftest allergic-to-more-than-eggs-but-not-peanuts ()
-  (should (equal '("eggs" "shellfish") (allergen-list 5))))
-
-(ert-deftest allergic-to-lots-of-stuff ()
-  (should (equal '("strawberries" "tomatoes" "chocolate" "pollen" "cats")
-                 (allergen-list 248))))
-
-(ert-deftest allergic-to-everything ()
-  (should (equal '("eggs" "peanuts" "shellfish" "strawberries" "tomatoes"
-                   "chocolate" "pollen" "cats")
-                 (allergen-list 255))))
-
-(ert-deftest no-allergies-means-not-allergic ()
-  (should-not (allergic-to-p 0 "peanuts"))
-  (should-not (allergic-to-p 0 "cats"))
-  (should-not (allergic-to-p 0 "strawberries")))
-
-(ert-deftest is-allergic-to-eggs ()
-  (should (allergic-to-p 1 "eggs")))
-
-(ert-deftest allergic-to-eggs-and-other-stuff ()
-  (should (allergic-to-p 5 "eggs")))
-
-(ert-deftest ignore-non-allergen-score-parts ()
-  (should (equal '("eggs" "shellfish" "strawberries" "tomatoes"
-                   "chocolate" "pollen" "cats")
-                 (allergen-list 509))))
-
-(ert-deftest no-allergen-score-parts-without-highest-valid-score ()
-  (should (equal '("eggs") (allergen-list 257))))
-
-(provide 'allergies)
-;;; allergies-test.el ends here
-
 #+end_src
 
 ** All Your Base
@@ -328,110 +230,8 @@ cd ${workspace}/${track}/all-your-base
 emacs -batch -l ert -l all-your-base-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/all-your-base/all-your-base-test.el
-;;; all-your-base-test.el --- Tests for All Your Base (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "all-your-base.el")
-(declare-function rebase "all-your-base.el" (list-of-digits in-base out-base))
-
-
-(ert-deftest single-bit-to-one-decimal ()
-  (should (equal '(1) (rebase '(1) 2 10))))
-
-
-(ert-deftest binary-to-single-decimal ()
-  (should (equal '(5) (rebase '(1 0 1) 2 10))))
-
-
-(ert-deftest single-decimal-to-binary ()
-  (should (equal '(1 0 1) (rebase '(5) 10 2))))
-
-
-(ert-deftest binary-to-multiple-decimal ()
-  (should (equal '(4 2) (rebase '(1 0 1 0 1 0) 2 10))))
-
-
-(ert-deftest decimal-to-binary ()
-  (should (equal '(1 0 1 0 1 0) (rebase '(4 2) 10 2))))
-
-
-(ert-deftest trinary-to-hexadecimal ()
-  (should (equal '(2 10) (rebase '(1 1 2 0) 3 16))))
-
-
-(ert-deftest hexadecimal-to-trinary ()
-  (should (equal '(1 1 2 0) (rebase '(2 10) 16 3))))
-
-
-(ert-deftest 15-bit-integer ()
-  (should (equal '(6 10 45) (rebase '(3 46 60) 97 73))))
-
-
-(ert-deftest empty-list ()
-  (should (equal '(0) (rebase '() 2 10))))
-
-
-(ert-deftest single-zero ()
-  (should (equal '(0) (rebase '(0) 10 2))))
-
-
-(ert-deftest multiple-zeros ()
-  (should (equal '(0) (rebase '(0 0 0) 10 2))))
-
-
-(ert-deftest leading-zeros ()
-  (should (equal '(4 2) (rebase '(0 6 0) 7 10))))
-
-
-(ert-deftest input-base-is-one ()
-  (should-error (rebase '(0) 1 10)))
-
-
-(ert-deftest input-base-is-zero ()
-  (should-error (rebase '() 0 10)))
-
-
-(ert-deftest input-base-is-negative ()
-  (should-error (rebase '(1) -2 10)))
-
-
-(ert-deftest input-base-is-negative ()
-  (should-error (rebase '(1 -1 1 0 1 0) 2 10)))
-
-
-(ert-deftest invalid-positive-digit ()
-  (should-error (rebase '(1 2 1 0 1 0) 2 10)))
-
-
-(ert-deftest output-base-is-one ()
-  (should-error (rebase '(1 0 1 0 1 0) 2 1)))
-
-
-(ert-deftest output-base-is-zero ()
-  (should-error (rebase '(7) 10 0)))
-
-
-(ert-deftest output-base-is-negative ()
-  (should-error (rebase '(1) 2 -7)))
-
-
-(ert-deftest both-bases-are-negative ()
-  (should-error (rebase '(1) -2 -7)))
-
-
-(provide 'all-your-base-test)
-;;; all-your-base-test.el ends here
-
-#+end_src
-
 ** Anagram
 Given a word and a list of possible anagrams, select the correct sublist.
-
-*** Start
 
 #+begin_src shell
 exercism download -t emacs-lisp -e anagram
@@ -477,98 +277,6 @@ cd ${workspace}/${track}/anagram
 emacs -batch -l ert -l anagram-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+RESULTS:
-:results:
-Loading ~/code/elisp/exercism/emacs-lisp/anagram/anagram.el (source)...
-Running 8 tests (2022-12-27 13:54:19+1100, selector ‘t’)
-   passed  1/8  case-insensitive-anagrams (0.000119 sec)
-   passed  2/8  detect-anagram (0.000086 sec)
-   passed  3/8  detect-simple-anagram (0.000083 sec)
-   passed  4/8  does-not-confuse-different-duplicates (0.000073 sec)
-   passed  5/8  eliminate-anagram-subsets (0.000078 sec)
-   passed  6/8  multiple-anagrams (0.000092 sec)
-   passed  7/8  no-matches (0.000092 sec)
-   passed  8/8  word-is-not-own-anagram (0.000066 sec)
-
-Ran 8 tests, 8 results as expected, 0 unexpected (2022-12-27 13:54:19+1100, 0.001088 sec)
-
-:end:
-
-#+begin_src elisp :tangle exercism/emacs-lisp/anagram/anagram-test.el
-;;; anagram-test.el --- Tests for Anagram (exercism)
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "anagram.el")
-
-(ert-deftest no-matches ()
-  (should (equal '() (anagrams-for
-                      "diaper"
-                      '("hello" "world" "zombies" "pants")))))
-
-(ert-deftest detect-simple-anagram ()
-  (should (equal '("tan") (anagrams-for
-                           "ant"
-                           '("tan" "stand" "at")))))
-
-(ert-deftest does-not-confuse-different-duplicates ()
-  (should (equal '() (anagrams-for
-                      "galea"
-                      '("eagle")))))
-
-(ert-deftest eliminate-anagram-subsets ()
-  (should (equal '() (anagrams-for
-                      "good"
-                      '("dog" "goody")))))
-
-(ert-deftest detect-anagram ()
-  (should (equal '("inlets") (anagrams-for
-                              "listen"
-                              '("enlists" "google" "inlets" "banana")))))
-
-(ert-deftest multiple-anagrams ()
-  (should (equal '("gallery" "regally" "largely")
-                 (anagrams-for
-                  "allergy"
-                  '("gallery" "ballerina" "regally" "clergy" "largely" "leading")))))
-
-(ert-deftest case-insensitive-anagrams ()
-    (should (equal '("Carthorse")
-                   (anagrams-for
-                    "Orchestra"
-                    '("cashregister" "Carthorse" "radishes")))))
-
-(ert-deftest word-is-not-own-anagram ()
-  (should (equal '()
-                 (anagrams-for
-                  "banana"
-                  '("banana")))))
-
-(ert-deftest word-is-not-own-anagram-if-letter-case-is-partially-different ()
-  (should (equal '()
-                 (anagrams-for
-                  "BANANA"
-                  '("Banana")))))
-
-(ert-deftest word-is-not-own-anagram-if-letter-case-is-completely-different ()
-  (should (equal '()
-                 (anagrams-for
-                  "BANANA"
-                  '("banana")))))
-
-(ert-deftest words-other-than-themselves-can-be-anagrams()
-  (should (equal '("Silent")
-                 (anagrams-for
-                  "LISTEN"
-                  '("Listen" "Silent" "LISTEN")))))
-
-(provide 'anagram-test)
-;;; anagram-test.el ends here
-
-#+end_src
-
 ** Armstrong Numbers
 Determine if a number is an Armstrong number.
 #+begin_src shell
@@ -607,60 +315,6 @@ exercism download -t emacs-lisp -e armstrong-numbers
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/armstrong-numbers
 emacs -batch -l ert -l armstrong-numbers-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+begin_src elisp :tangle exercism/emacs-lisp/armstrong-numbers/armstrong-numbers-test.el
-;;; armstrong-numbers-test.el --- Tests for armstrong-numbers (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "armstrong-numbers.el")
-(declare-function armstrong-p "armstrong-numbers.el" (n))
-
-(ert-deftest armstrong-number-5 ()
-  "Single digit numbers are Armstrong numbers"
-  (should (armstrong-p 5)))
-
-(ert-deftest not-armstrong-number-10 ()
-  "There are no 2 digit Armstrong numbers"
-  (should (not (armstrong-p 10))))
-
-(ert-deftest armstrong-number-153 ()
-  "Three digit number that should an Armstrong number"
-  (should (armstrong-p 153)))
-
-(ert-deftest not-armstrong-number-100 ()
-  "Three digit number that should an Armstrong number"
-  (should (not (armstrong-p 100))))
-
-(ert-deftest armstrong-number-9474 ()
-  "Four digit number that should an Armstrong number"
-  (should (armstrong-p 9474)))
-
-(ert-deftest not-armstrong-number-9475 ()
-  "Four digit number that should not an Armstrong number"
-  (should (not (armstrong-p 9476))))
-
-(ert-deftest armstrong-number-9926315 ()
-  "Seven digit number that should an Armstrong number"
-  (should (armstrong-p 9926315)))
-
-(ert-deftest not-armstrong-number-9926314 ()
-  "Seven digit number that should not an Armstrong number"
-  (should (not (armstrong-p 9926314))))
-
-(ert-deftest armstrong-number-186709961001538790100634132976990 ()
-  "Armstrong number containing seven zeroes that should be an Armstrong number"
-  (should (armstrong-p 186709961001538790100634132976990)))
-
-(ert-deftest armstrong-number-115132219018763992565095597973971522401 ()
-  "The largest and last Armstrong number should be an Armstrong number"
-  (should (armstrong-p 115132219018763992565095597973971522401)))
-
-;;; armstrong-numbers-test.el ends here
-
 #+end_src
 
 ** Atbash Cipher
@@ -712,57 +366,9 @@ cd ${workspace}/${track}/atbash-cipher
 emacs -batch -l ert -l atbash-cipher-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/atbash-cipher/atbash-cipher-test.el
-;;; atbash-cipher-test.el --- Tests for Atbash Cipher (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(require 'cl-lib)
-
-(load-file "atbash-cipher.el")
-(declare-function encode "atbash-cipher.el" (plaintext))
-
-(ert-deftest encode-no ()
-  (should (equal "ml" (encode "no"))))
-
-(ert-deftest encode-yes ()
-  (should (equal "bvh" (encode "yes"))))
-
-(ert-deftest encode-OMG ()
-  (should (equal "lnt" (encode "OMG"))))
-
-(ert-deftest encode-O-M-G ()
-  (should (equal "lnt" (encode "O M G"))))
-
-(ert-deftest encode-long-word ()
-  (should (equal "nrmwy oldrm tob"
-                 (encode "mindblowingly"))))
-
-(ert-deftest encode-numbers ()
-  (should (equal "gvhgr mt123 gvhgr mt"
-                 (encode "Testing, 1 2 3, testing."))))
-
-(ert-deftest encode-sentence ()
-  (should (equal "gifgs rhurx grlm"
-                 (encode "Truth is fiction."))))
-
-(ert-deftest encode-all-the-things ()
-  (let ((plaintext "The quick brown fox jumps over the lazy dog.")
-        (ciphertext "gsvjf rxpyi ldmul cqfnk hlevi gsvoz abwlt"))
-    (should (equal ciphertext
-                   (encode plaintext)))))
-
-(provide 'atbash-cipher-test)
-;;; atbash-cipher-test.el ends here
-
-#+end_src
-
 ** Bob
 Bob is a lackadaisical teenager. In conversation, his responses are very limited.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e bob
 #+end_src
@@ -824,121 +430,6 @@ cd ${workspace}/${track}/bob
 emacs -batch -l ert -l bob-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/bob/bob-test.el
-;;; bob-test.el --- ERT tests for Bob (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-;; Common test data version: 1.2.0 6dc2014
-
-;;; Code:
-
-(load-file "bob.el")
-(declare-function response-for "bob.el" (phrase))
-
-(ert-deftest responds-to-stating-something ()
-  (should (string= "Whatever." (response-for "Tom-ay-to, tom-aaaah-to."))))
-
-(ert-deftest responds-to-shouting ()
-  (should
-   (string= "Whoa, chill out!" (response-for "WATCH OUT!"))))
-
-(ert-deftest responds-to-shouting-gibberish ()
-  (should
-   (string= "Whoa, chill out!" (response-for "FCECDFCAAB"))))
-
-(ert-deftest responds-to-asking-a-question ()
-  (should
-   (string= "Sure." (response-for "Does this cryogenic chamber make me look fat?"))))
-
-(ert-deftest responds-to-asking-a-numeric-question ()
-  (should
-   (string= "Sure." (response-for "You are, what, like 15?"))))
-
-(ert-deftest responds-to-asking-gibberish ()
-  (should
-   (string= "Sure." (response-for "fffbbcbeab?"))))
-
-(ert-deftest responds-to-talking-forcefully ()
-  (should
-   (string= "Whatever." (response-for "Let's go make out behind the gym!"))))
-
-(ert-deftest responds-to-using-acronyms-in-regular-speech ()
-  (should
-   (string= "Whatever." (response-for "It's OK if you don't want to go to the DMV."))))
-
-(ert-deftest responds-to-forceful-question ()
-  (should
-   (string= "Calm down, I know what I'm doing!" (response-for "WHAT THE HELL WERE YOU THINKING?"))))
-
-(ert-deftest responds-to-shouting-numbers ()
-  (should
-   (string= "Whoa, chill out!" (response-for "1, 2, 3, GO!"))))
-
-(ert-deftest responds-to-only-numbers ()
-  (should
-   (string= "Whatever." (response-for "1, 2, 3"))))
-
-(ert-deftest responds-to-questions-with-only-numbers ()
-  (should
-   (string= "Sure." (response-for "4?"))))
-
-(ert-deftest responds-to-shouting-with-special-chars ()
-  (should
-   (string= "Whoa, chill out!" (response-for "ZOMG THE %^*@#$(*^ ZOMBIES ARE COMING!!11!!1!"))))
-
-(ert-deftest responds-to-shouting-with-no-exclamation-mark ()
-  (should
-   (string= "Whoa, chill out!" (response-for "I HATE YOU"))))
-
-(ert-deftest responds-to-statement-containing-question-mark ()
-  (should
-   (string= "Whatever." (response-for "Ending with ? means a question."))))
-
-(ert-deftest responds-to-non-letters-with-question ()
-  (should
-   (string= "Sure." (response-for ":) ?"))))
-
-(ert-deftest responds-to-prattling-on ()
-  (should
-   (string= "Sure." (response-for "Wait! Hang on. Are you going to be OK?"))))
-
-(ert-deftest responds-to-silence ()
-  (should
-   (string= "Fine. Be that way!" (response-for ""))))
-
-(ert-deftest responds-to-prolonged-silence ()
-  (should
-   (string= "Fine. Be that way!" (response-for "    "))))
-
-(ert-deftest responds-to-alternate-silence ()
-  (should
-   (string= "Fine. Be that way!" (response-for "\t\t\t\t\t\t\t\t\t\t"))))
-
-(ert-deftest responds-to-multiple-line-question ()
-  (should
-   (string= "Whatever." (response-for "\nDoes this cryogenic chamber make me look fat?\nno"))))
-
-(ert-deftest responds-to-starting-with-whitespace ()
-  (should
-   (string= "Whatever." (response-for "         hmmmmmmm..."))))
-
-(ert-deftest responds-to-ending-with-whitespace ()
-  (should
-   (string= "Sure." (response-for "Okay if like my  spacebar  quite a bit?   "))))
-
-(ert-deftest responds-to-other-whitespace ()
-  (should
-   (string= "Fine. Be that way!" (response-for "\n\r \t"))))
-
-(ert-deftest responds-to-non-question-ending-with-whitespace ()
-  (should
-   (string= "Whatever." (response-for "This is a statement ending with whitespace      "))))
-
-(provide 'bob-test)
-;;;bob-test.el ends here
-
-#+end_src
-
 ** Crypto Square
 Implement the classic method for composing secret messages called a square code.
 #+begin_src shell
@@ -950,7 +441,7 @@ exercism download -t emacs-lisp -e crypto-square
 
 [[https://exercism.org/tracks/emacs-lisp/exercises/crypto-square][Overview]]
 
-*** TODO Code
+*** Code
 #+begin_src elisp :tangle exercism/emacs-lisp/crypto-square/crypto-square.el
 ;;; crypto-square.el --- Crypto Square (exercism)  -*- lexical-binding: t; -*-
 (defun encipher (plaintext)
@@ -995,50 +486,9 @@ cd ${workspace}/${track}/crypto-square
 emacs -batch -l ert -l crypto-square-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/crypto-square/crypto-square-test.el
-;;; crypto-square-test.el --- Tests for Crypto Square (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "crypto-square.el")
-(declare-function encipher "crypto-square.el" (plaintext))
-
-(ert-deftest empty-plaintext-results-in-an-empty-ciphertext ()
-  (should (equal "" (encipher ""))))
-
-(ert-deftest lowercase ()
-  (should (equal "a" (encipher"A"))))
-
-(ert-deftest remove-spaces ()
-  (should (equal "b" (encipher "  b "))))
-
-(ert-deftest remove-punctuation ()
-  (should (equal "1" (encipher "@1,%!"))))
-
-(ert-deftest 9-character-plaintext-results-in-3-chunks-of-3-characters ()
-  (should (equal "tsf hiu isn" (encipher "This is fun!"))))
-
-(ert-deftest 8-character-plaintext-results-in-3-chunks-the-last-one-with-a-trailing-space ()
-  (should (equal "clu hlt io " (encipher "Chill out."))))
-
-(ert-deftest 54-character-plaintext-results-in-7-chunks-the-last-two-with-trailing-spaces ()
-  (should (equal "imtgdvs fearwer mayoogo anouuio ntnnlvt wttddes aohghn  sseoau "
-                 (encipher "If man was meant to stay on the ground, god would have given us roots."))))
-
-(ert-deftest normalization-results-in-empty-plaintext ()
-  (should (equal "" (encipher "... --- ..."))))
-
-(provide 'crypto-square-test)
-;;; crypto-square-test.el ends here
-
-#+end_src
-
 ** Difference of Squares
 Find the difference between the square of the sum and the sum of the squares of the first N natural numbers.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e difference-of-squares
 #+end_src
@@ -1077,53 +527,6 @@ exercism download -t emacs-lisp -e difference-of-squares
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/difference-of-squares
 emacs -batch -l ert -l difference-of-squares-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+begin_src elisp :tangle exercism/emacs-lisp/difference-of-squares/difference-of-squares-test.el
-;;; difference-of-squares-test.el --- Tests for difference-of-squares (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "difference-of-squares.el")
-(declare-function sum-of-squares "difference-of-squares.el" (n))
-(declare-function square-of-sum "difference-of-squares.el" (n))
-(declare-function difference "difference-of-squares.el" (n))
-
-(ert-deftest square-of-sum-to-5 ()
-  (should (= 225 (square-of-sum 5))))
-
-(ert-deftest sum-of-squares-to-5 ()
-  (should (= 55 (sum-of-squares 5))))
-
-(ert-deftest difference-of-squares-to-5 ()
-  (should (= 170 (difference 5))))
-
-
-(ert-deftest square-of-sum-to-10 ()
-  (should (= 3025 (square-of-sum 10))))
-
-(ert-deftest sum-of-squares-to-10 ()
-  (should (= 385 (sum-of-squares 10))))
-
-(ert-deftest difference-of-squares-to-10 ()
-  (should (= 2640 (difference 10))))
-
-
-(ert-deftest square-of-sum-to-100 ()
-  (should (= 25502500 (square-of-sum 100))))
-
-(ert-deftest sum-of-squares-to-100 ()
-  (should (= 338350 (sum-of-squares 100))))
-
-(ert-deftest difference-of-squares-to-100 ()
-  (should (= 25164150 (difference 100))))
-
-
-(provide 'difference-of-squares-test)
-;;; difference-of-squares-test.el ends here
-
 #+end_src
 
 ** ETL
@@ -1169,105 +572,9 @@ cd ${workspace}/${track}/etl
 emacs -batch -l ert -l etl-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/etl/etl-test.el
-;;; etl-test.el --- Tests for etl (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "etl.el")
-(declare-function etl "etl.el" (data))
-
-
-(defconst mixed-case-input #s(hash-table
-                              data (1 ("a" "E" "I" "o" "U" "L" "N" "r" "s" "T")
-                                      2 ("D" "G")
-                                      3 ("B" "c" "M" "P")
-                                      4 ("f" "h" "V" "W" "y")
-                                      5 ("K")
-                                      8 ("J" "x")
-                                      10 ("q" "z"))))
-
-
-(defconst mixed-case-expected #s(hash-table
-                                 data ("a" 1 
-                                        "b" 3
-                                        "c" 3
-                                        "d" 2
-                                        "e" 1
-                                        "f" 4
-                                        "g" 2
-                                        "h" 4
-                                        "i" 1 
-                                        "j" 8
-                                        "k" 5
-                                        "l" 1
-                                        "m" 3
-                                        "n" 1
-                                        "o" 1
-                                        "p" 3
-                                        "q" 10
-                                        "r" 1
-                                        "s" 1
-                                        "t" 1 
-                                        "u" 1
-                                        "v" 4
-                                        "x" 8
-                                        "w" 4
-                                        "y" 4
-                                        "z" 10)))
-  
-
-(defconst negative-keys-input #s(hash-table
-                                 data (1 ("L" "N")
-                                         -3 ("B" "c" "P"))))
-
-
-(defconst listof-chars-input #s(hash-table
-                                data (1 (?N ?r ?q))))
-
-
-(defun hash->list (hash)
-  (let (lst)
-    (maphash (lambda (k v) (push (cons k v) lst)) hash)
-    lst))
-
-
-(defun sort-pairs (lst fn)
-  (sort lst (lambda (a b) (funcall fn (car a) (car b)))))
-
-
-(defun hash-equal (a b fn)
-  (equal (sort-pairs (hash->list a) fn)
-         (sort-pairs (hash->list b) fn)))
-
-
-(ert-deftest empty-hash-test ()
-  (should (zerop (hash-table-count (etl (make-hash-table))))))
-
-
-(ert-deftest mixed-case-test ()
-  (should (hash-equal (etl mixed-case-input) mixed-case-expected #'string<)))
-
-
-(ert-deftest negative-key-test ()
-  (should-error (etl negative-keys-input)))
-
-
-(ert-deftest list-of-non-string-values-test ()
-  (should-error (etl listof-chars-input)))
-
-
-(provide 'etl)
-;;; etl-test.el ends here
-
-#+end_src
-
 ** Gigasecond
 Given a moment, determine the moment that would be after a gigasecond has passed.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e gigasecond
 #+end_src
@@ -1317,56 +624,6 @@ cd ${workspace}/${track}/gigasecond
 emacs -batch -l ert -l gigasecond-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/gigasecond/gigasecond-test.el
-;;; gigasecond-test.el --- ERT tests for gigasecond (exercism)
-
-;;; Commentary:
-;;
-;; Tests ported from Common Lisp gigasecond:
-;; https://github.com/exercism/xlisp/blob/master/gigasecond/gigasecond-test.lisp
-;;
-;; To run tests individually: M-x eval-buffer RET, M-x ert RET test-name.
-;; If you're using helm or something similar, you should get a menu of test names.
-;;
-;; To run tests in batch mode, from the command line run:
-;; emacs -batch -l ert -l gigasecond-test.el -f ert-run-tests-batch-and-exit
-
-;;; Code:
-
-(load-file "gigasecond.el")
-
-(ert-deftest from-lisp-epoch ()
-  (should
-   (equal '(40 46 1 10 9 1931) (from 0 0 0 1 1 1900))))
-
-(ert-deftest from-unix-epoch ()
-  (should
-   (equal '(40 46 1 9 9 2001) (from 0 0 0 1 1 1970))))
-
-(ert-deftest from-20110425T120000Z ()
-  (should
-   (equal '(40 46 13 1 1 2043) (from 0 0 12 25 4 2011))))
-
-(ert-deftest from-19770613T235959Z ()
-  (should
-   (equal '(39 46 1 20 2 2009) (from 59 59 23 13 6 1977))))
-
-(ert-deftest from-19590719T123030Z ()
-  (should
-   (equal '(10 17 14 27 3 1991) (from 30 30 12 19 7 1959))))
-
-; customize this test to test your birthday and find your gigasecond date:
-; (ert-deftest your-birthday ()
-;   (should
-;     (equal '(0 0 0 day2 month2 year2) (from 0 0 0 day1 month1 year1))))
-
-
-
-(provide 'gigasecond-test)
-;;; gigasecond-test.el ends here
-
-#+end_src
-
 ** Grains
 Calculate the number of grains of wheat on a chessboard given that the number on each square doubles.
 #+begin_src shell
@@ -1403,54 +660,9 @@ cd ${workspace}/${track}/grains
 emacs -batch -l ert -l grains-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/grains/grains-test.el
-;;; grains-test.el --- Test for Grains (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "grains.el")
-(declare-function square "grains.el" (n))
-(declare-function total "grains.el")
-
-(ert-deftest square-1 ()
-  (should (= 1 (square 1))))
-
-(ert-deftest square-2 ()
-  (should (= 2 (square 2))))
-
-(ert-deftest square-3 ()
-  (should (= 4 (square 3))))
-
-(ert-deftest square-4 ()
-  (should (= 8 (square 4))))
-
-(ert-deftest square-16 ()
-  (should (= 32768
-             (square 16))))
-
-(ert-deftest square-32 ()
-  (should (= 2147483648
-             (square 32))))
-
-(ert-deftest square-64 ()
-  (should (= 9223372036854775808
-             (square 64))))
-
-(ert-deftest total-grains ()
-  (should (= 18446744073709551615
-             (total))))
-
-(provide 'grains-test.el)
-;;; grains-test.el ends here.
-
-#+end_src
-
 ** Hamming
 Calculate the Hamming difference between two DNA strands.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e hamming
 #+end_src
@@ -1488,69 +700,9 @@ cd ${workspace}/${track}/hamming
 emacs -batch -l ert -l hamming-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/hamming/hamming-test.el
-;;; hamming-test.el --- Tests for hamming (exercism)
-
-;;; Commentary:
-;; Common test data version: 2.0.1 f79dfd7
-
-;;; Code:
-
-(load-file "hamming.el")
-
-(declare-function hamming-distance "hamming.el")
-
-(ert-deftest empty-strands ()
-  (should (= 0 (hamming-distance "" ""))))
-
-(ert-deftest identical-strands ()
-  (should (= 0 (hamming-distance "A" "A"))))
-
-(ert-deftest long-identical-strands ()
-  (should (= 0 (hamming-distance "GGACTGA" "GGACTGA"))))
-
-(ert-deftest complete-distance-in-single-nucleotide-strands ()
-  (should (= 1 (hamming-distance "A" "G"))))
-
-(ert-deftest complete-distance-in-small-strands ()
-  (should (= 2 (hamming-distance "AG" "CT"))))
-
-(ert-deftest small-distance-in-small-strands ()
-  (should (= 1 (hamming-distance "AT" "CT"))))
-
-(ert-deftest small-distance ()
-  (should (= 1 (hamming-distance "GGACG" "GGTCG"))))
-
-(ert-deftest small-distance-in-long-strands ()
-  (should (= 2 (hamming-distance "ACCAGGG" "ACTATGG"))))
-
-(ert-deftest non-unique-character-in-first-strand ()
-  (should (= 1 (hamming-distance "AAA" "AAG"))))
-
-(ert-deftest same-nucleotides-in-different-positions ()
-  (should (= 2 (hamming-distance "TAG" "GAT"))))
-
-(ert-deftest large-distance ()
-  (should (= 4 (hamming-distance "GATACA" "GCATAA"))))
-
-(ert-deftest large-distance-in-off-by-one-strand ()
-  (should (= 9 (hamming-distance "GGACGGATTCTG" "AGGACGGATTCT"))))
-
-(ert-deftest disallow-first-strand-longer ()
-  (should-error (hamming-distance "AATG" "AAA")))
-
-(ert-deftest disallow-second-strand-longer ()
-  (should-error (hamming-distance "ATA" "AGTG")))
-
-(provide 'hamming-test)
-;;; hamming-test.el ends here
-
-#+end_src
-
 ** Hello World
 The classical introductory exercise. Just say "Hello, World!".
 
-*** Start
 #+begin_src shell :var exname="hello-world"
 exercism download -t emacs-lisp -e ${exname}
 #+end_src
@@ -1580,40 +732,9 @@ cd ${workspace}/${track}/hello-world
 emacs -batch -l ert -l hello-world-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+RESULTS:
-:results:
-Loading ~/code/elisp/exercism/emacs-lisp/hello-world/hello-world.el (source)...
-Running 1 tests (2022-12-27 09:55:08+1100, selector ‘t’)
-   passed  1/1  hello-world-test (0.000094 sec)
-
-Ran 1 tests, 1 results as expected, 0 unexpected (2022-12-27 09:55:08+1100, 0.000198 sec)
-
-:end:
-
-#+begin_src elisp :tangle exercism/emacs-lisp/hello-world/hello-world-test.el
-;;; hello-world-test.el --- Tests for Hello World (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-;; Common test data version: 1.1.0 be3ae66
-
-;;; Code:
-
-(load-file "hello-world.el")
-(declare-function hello "hello-world.el")
-
-(ert-deftest hello-world-test ()
-  (should (string= (hello) "Hello, World!")))
-
-(provide 'hello-world-test)
-
-;;; hello-world-test.el ends here
-
-#+end_src
-
 ** Leap
 Given a year, report if it is a leap year.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e leap
 #+end_src
@@ -1649,48 +770,6 @@ exercism download -t emacs-lisp -e leap
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/leap
 emacs -batch -l ert -l leap-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+RESULTS:
-:results:
-Loading ~/code/elisp/exercism/emacs-lisp/leap/leap.el (source)...
-Running 5 tests (2022-12-27 09:53:11+1100, selector ‘t’)
-   passed  1/5  any-old-year (0.000298 sec)
-   passed  2/5  century (0.000062 sec)
-   passed  3/5  exceptional-century (0.000051 sec)
-   passed  4/5  non-leap-even-year (0.000089 sec)
-   passed  5/5  vanilla-leap-year (0.000067 sec)
-
-Ran 5 tests, 5 results as expected, 0 unexpected (2022-12-27 09:53:11+1100, 0.000819 sec)
-
-:end:
-
-#+begin_src elisp :tangle exercism/emacs-lisp/leap/leap-test.el
-;;; leap-test.el --- Tests for Leap exercise (exercism)
-
-;;; Commentary:
-
-;;; Code:
-(load-file "leap.el")
-
-(ert-deftest vanilla-leap-year ()
-  (should (leap-year-p 1996)))
-
-(ert-deftest any-old-year ()
-  (should-not (leap-year-p 1997)))
-
-(ert-deftest non-leap-even-year ()
-  (should-not (leap-year-p 1997)))
-
-(ert-deftest century ()
-  (should-not (leap-year-p 1900)))
-
-(ert-deftest exceptional-century ()
-  (should (leap-year-p 2000)))
-
-(provide 'leap-test)
-;;; leap-test.el ends here
-
 #+end_src
 
 ** List Ops
@@ -1804,157 +883,6 @@ cd ${workspace}/${track}/list-ops
 emacs -batch -l ert -l list-ops-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/list-ops/list-ops-test.el
-;;; list-ops-test.el --- Tests for List Ops (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "list-ops.el")
-(declare-function list-append "list-ops.el" (list1 list2))
-(declare-function list-concatenate "list-ops.el" (list1 list2 &rest LISTS))
-(declare-function list-filter "list-ops.el" (list function))
-(declare-function list-length "list-ops.el" (list))
-(declare-function list-map "list-ops.el" (list function))
-(declare-function list-foldl "list-ops.el" (list function init))
-(declare-function list-foldr "list-ops.el" (list function init))
-(declare-function list-reverse "list-ops.el" (list))
-(declare-function list-sum "list-ops.el" (list))
-(declare-function list-empty-p "list-ops.el" (list))
-
-
-(ert-deftest append-empt-lists ()
-  (should (equal '() (list-append '() '()))))
-
-
-(ert-deftest append-first-list-empty ()
-  (should (equal '(1 2 3 4) (list-append '() '(1 2 3 4)))))
-
-
-(ert-deftest append-second-list-empty ()
-  (should (equal '(1 2 3 4) (list-append '(1 2 3 4) '()))))
-
-
-(ert-deftest append-non-empty-lists ()
-  (should (equal '(1 2 2 3 4 5) (list-append '(1 2) '(2 3 4 5)))))
-
-
-(ert-deftest concatenate-multiple-lists ()
-  (should (equal '(1 2 3 4 5 6) (list-concatenate '(1 2) '(3) '() '(4 5 6)))))
-
-
-(ert-deftest concatenate-nested-lists ()
-  (should (equal '((1) (2) (3) () (4 5 6)) (list-concatenate '((1) (2)) '((3)) '(()) '((4 5 6))))))
-
-
-(ert-deftest filter-empty-list ()
-  (should (equal '() (list-filter '() (lambda (elem) (= 1 (% elem 2)))))))
-
-
-(ert-deftest filter-matching-elements ()
-  (should (equal '(1 3 5) (list-filter '(1 2 3 5) (lambda (elem) (= 1 (% elem 2)))))))
-
-
-(ert-deftest length-empty-list ()
-  (should (equal 0 (list-length '()))))
-
-
-(ert-deftest length-with-elements ()
-  (should (equal 4 (list-length '(1 2 3 4)))))
-
-
-(ert-deftest map-increment-empty-list ()
-  (should (equal '() (list-map '() '1+))))
-
-
-(ert-deftest map-increment-elements ()
-  (should (equal '(2 4 6 8) (list-map '(1 3 5 7) '1+))))
-
-
-(ert-deftest foldl-empty-list ()
-  (should (equal 2 (list-foldl '* '() 2))))
-
-
-(ert-deftest foldl-sum-elements ()
-  (should (equal 15 (list-foldl (lambda (accu elem) (+ elem accu)) '(1 2 3 4) 5))))
-
-
-(ert-deftest foldl-floating-point-division ()
-  (should (equal 64.0 (list-foldl (lambda (accu elem) (/ elem accu)) '(1 2 3 4) 24.0))))
-
-
-(ert-deftest foldl-multiply-empty-list ()
-  (should (equal 2 (list-foldl (lambda (accu elem) (* elem accu)) '() 2))))
-
-
-(ert-deftest foldr-empty-list ()
-  (should (equal 2 (list-foldr '* '() 2))))
-
-
-(ert-deftest foldr-sum-elements ()
-  (should (equal 15 (list-foldr (lambda (elem accu) (+ elem accu)) '(1 2 3 4) 5))))
-
-
-(ert-deftest foldr-floating-point-division ()
-  (should (equal 9.0 (list-foldr (lambda (elem accu) (/ elem accu)) '(1 2 3 4) 24.0))))
-
-
-(ert-deftest foldr-multiply-empty-list ()
-  (should (equal 2 (list-foldr (lambda (elem accu) (* elem accu)) '() 2))))
-
-
-(ert-deftest reverse-empty-list ()
-  (should (equal '() (list-reverse '()))))
-
-
-(ert-deftest reverse-list-with-members ()
-  (should (equal '(7 5 3 1) (list-reverse '(1 3 5 7)))))
-
-
-(ert-deftest reverse-list-not-flattened ()
-  (should (equal '((4 5 6) () (3) (2) (1)) (list-reverse '((1) (2) (3) () (4 5 6))))))
-
-;; Emacs Lisp track specific:
-
-(ert-deftest sum-empty-list ()
-  (should (equal 0 (list-sum '()))))
-
-
-(ert-deftest sum-elements ()
-  (should (equal 10 (list-sum '(1 2 3 4)))))
-
-
-(ert-deftest empty-p-empty ()
-  (should (equal t (list-empty-p '()))))
-
-
-(ert-deftest empty-p-element ()
-  (should (equal nil (list-empty-p '(1)))))
-
-
-(ert-deftest empty-p-elements ()
-  (should (equal nil (list-empty-p '(1 2 3 4)))))
-
-
-;; Bonus tests with large lists that hit the recursion limit set by `max-lisp-eval-depth'
-
-;; (require 'cl-lib)
-
-;; (ert-deftest large-list-foldl ()
-;;   (let ((list (cl-loop for i upto (1+ max-lisp-eval-depth) collect i)))
-;;     (should (equal (apply '+ list) (list-foldl (lambda (elem accu) (+ elem accu)) list 0)))))
-
-;; (ert-deftest large-list-foldr ()
-;;   (let ((list (cl-loop for i upto (1+ max-lisp-eval-depth) collect i)))
-;;     (should (equal (apply '+ list) (list-foldr (lambda (elem accu) (+ elem accu)) list 0)))))
-
-
-(provide 'list-ops-test)
-;;; list-ops-test.el ends here
-
-#+end_src
-
 ** Luhn
 Given a number determine whether or not it is valid per the Luhn formula.
 #+begin_src shell
@@ -2016,78 +944,6 @@ cd ${workspace}/${track}/luhn
 emacs -batch -l ert -l luhn-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/luhn/luhn-test.el
-;;; luhn-test.el --- Tests for luhn (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(require 'cl-lib)
-
-(load-file "luhn.el")
-(declare-function luhn-p "luhn.el" (str))
-
-(ert-deftest an-empty-string ()
-  (should-not (luhn-p "")))
-
-(ert-deftest space-only ()
-  (should-not (luhn-p "   ")))
-
-(ert-deftest single-digit ()
-  (should-not (luhn-p "0")))
-
-(ert-deftest another-single-digit ()
-  (should-not (luhn-p "9")))
-
-(ert-deftest single-digit-with-space ()
-  (should-not (luhn-p "0  ")))
-
-(ert-deftest multiple-zeros ()
-  (should (luhn-p "0000")))
-
-(ert-deftest multiple-zeros-with-space ()
-  (should (luhn-p "0 0 0")))
-
-(ert-deftest a-valid-3-digit-input-that-can-be-reversed ()
-  (should (luhn-p "059")))
-
-(ert-deftest an-invalid-3-digit-input ()
-  (should-not (luhn-p "095")))
-
-(ert-deftest a-valid-luhn-number ()
-  (should (luhn-p "49927398716")))
-
-(ert-deftest an-invalid-11-digit-number ()
-  (should-not (luhn-p "49927398717")))
-
-(ert-deftest invalid-16-digit-luhn-number ()
-  (should-not (luhn-p  "1234567812345678")))
-
-(ert-deftest 16-digits-valid-luhn-number ()
-  (should (luhn-p "1234567812345670")))
-
-(ert-deftest input-string-containing-a-letter-in-the-middle ()
-  (should-error (luhn-p "1234567a45670")))
-
-(ert-deftest input-string-containing-a-punctuation-in-the-middle ()
-  (should-error (luhn-p "12_45678!!@45670")))
-
-(ert-deftest invalid-long-number-with-a-remainder-divisble-by-5 ()
-  (should-not (luhn-p "1 2345 6789 1234 5678 9013")))
-
-(ert-deftest very-long-input-is-valid ()
-  (should (luhn-p "9999999999 9999999999 9999999999 9999999999")))
-
-(ert-deftest valid-luhn-with-an-odd-number-of-digits-and-non-zero-first-digit ()
-  (should (luhn-p "109")))
-
-(provide 'luhn-test)
-;;; luhn-test.el ends here
-
-
-#+end_src
-
 ** Nucleotide Count
 Given a DNA string, compute how many times each nucleotide occurs in the string.
 #+begin_src shell
@@ -2130,45 +986,6 @@ cd ${workspace}/${track}/nucleotide-count
 emacs -batch -l ert -l nucleotide-count-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/nucleotide-count/nucleotide-count-test.el
-;;; nucleotide-count-test.el --- Tests for nucleotide-count (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "nucleotide-count.el")
-(declare-function nucleotide-count "nucleotide-count.el" (sequence))
-
-
-(defun sort-pairs (lst fn)
-  (sort lst (lambda (a b) (funcall fn (car a) (car b)))))
-
-
-(ert-deftest empty-dna-strand-has-no-nucleotides-test ()
-  (should (equal (sort-pairs (nucleotide-count "") #'<)
-                 '((?A . 0) (?C . 0) (?G . 0) (?T . 0)))))
-
-
-(ert-deftest repetitive-sequence-has-only-guanine-test ()
-  (should (equal (sort-pairs (nucleotide-count "GGGGGGGG") #'<)
-                 '((?A . 0) (?C . 0) (?G . 8) (?T . 0)))))
-
-
-(ert-deftest count-all-nucleotides-test ()
-  (should (equal (sort-pairs (nucleotide-count "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC") #'<)
-                 '((?A . 20) (?C . 12) (?G . 17) (?T . 21)))))
-
-
-(ert-deftest invalid-nucleotide-test ()
-  (should-error (nucleotide-count "AGGTCCXGA")))
-
-
-(PROVIDE 'nucleotide-count)
-;;; nucleotide-count-test.el ends here
-
-#+end_src
-
 ** Pangram
 Determine if a sentence is a pangram.
 #+begin_src shell
@@ -2198,52 +1015,6 @@ exercism download -t emacs-lisp -e pangram
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/pangram
 emacs -batch -l ert -l pangram-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+begin_src elisp :tangle exercism/emacs-lisp/pangram/pangram-test.el
-;;; pagram-test.el --- Tests for Pangram (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-;; Common test data version: 1.3.0 d79e13e
-
-;;; Code:
-
-(load-file "pangram.el")
-(declare-function is-pangram "pangram.el" (phrase))
-
-(ert-deftest sentence-empty ()
-  (should (equal nil (is-pangram ""))))
-
-(ert-deftest recognizes-a-perfect-lower-case-pangram ()
-  (should (equal t (is-pangram "abcdefghijklmnopqrstuvwxyz"))))
-
-(ert-deftest  pangram-with-only-lower-case ()
-  (should (equal t (is-pangram "the quick brown fox jumps over the lazy dog"))))
-
-(ert-deftest missing-character-x ()
-  (should (equal nil (is-pangram "a quick movement of the enemy will jeopardize five gunboats"))))
-
-(ert-deftest missing-another-character-eg-h ()
-  (should (equal nil (is-pangram "five boxing wizards jump quickly at it"))))
-
-(ert-deftest  pangram-with-underscores ()
-  (should (equal t (is-pangram "the_quick_brown_fox_jumps_over_the_lazy_dog"))))
-
-(ert-deftest  pangram-with-numbers ()
-  (should (equal t (is-pangram "the 1 quick brown fox jumps over the 2 lazy dogs"))))
-
-(ert-deftest  missing-letters-replaced-by-numbers ()
-  (should (equal nil (is-pangram "7h3 qu1ck brown fox jumps ov3r 7h3 lazy dog"))))
-
-(ert-deftest  pangram-with-mixed-case-and-punctuation ()
-  (should (equal t (is-pangram "\"Five quacking Zephyrs jolt my wax bed.\""))))
-
-(ert-deftest  a-m-and-A-M-are-26-different-characters-but-not-a-pangram ()
-  (should (equal nil (is-pangram "abcdefghijklm ABCDEFGHIJKLM"))))
-
-(provide 'pangram-test)
-;;; pagram-test.el ends here
-
 #+end_src
 
 ** Perfect Numbers
@@ -2302,70 +1073,6 @@ cd ${workspace}/${track}/perfect-numbers
 emacs -batch -l ert -l perfect-numbers-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/perfect-numbers/perfect-numbers-test.el
-;;; perfect-numbers-test.el --- Tests for perfect-numbers (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "perfect-numbers.el")
-(declare-function classify "perfect-numbers.el" (number))
-
-;;; Perfect Numbers
-(ert-deftest smallest-perfect-number ()
-    (should (equal (classify 6) 'perfect)))
-
-(ert-deftest medium-perfect-number ()
-  (should (equal (classify 28) 'perfect)))
-
-(ert-deftest large-perfect-number ()
-  (should (equal (classify 33550336) 'perfect)))
-
-;;; Abundant Numbers
-(ert-deftest smallest-abundant-number ()
-  (should (equal (classify 12) 'abundant)))
-
-(ert-deftest medium-abundant-number ()
-  (should (equal (classify 30) 'abundant)))
-
-(ert-deftest large-abundant-number ()
-  (should (equal (classify 33550335) 'abundant)))
-
-;;; Deficient Numbers
-(ert-deftest smallest-deficient-number ()
-  (should (equal (classify 2) 'deficient)))
-
-(ert-deftest smallest-non-prime-deficient-number ()
-  (should (equal (classify 4) 'deficient)))
-
-(ert-deftest medium-deficient-number ()
-  (should (equal (classify 32) 'deficient)))
-
-(ert-deftest large-deficient-number ()
-  (should (equal (classify 33550337) 'deficient)))
-
-(ert-deftest edge-case-no-factors-other-than-self ()
-  (should (equal (classify 1) 'deficient)))
-
-;;; Invalid Inputs
-(ert-deftest zero-is-rejected ()
-  (should
-   (equal
-    (should-error (classify 0))
-    '(error . ("Classification is only possible for natural numbers")))))
-
-(ert-deftest negative-integer-is-rejected ()
-  (should
-   (equal
-    (should-error (classify -1))
-    '(error . ("Classification is only possible for natural numbers")))))
-
-(provide 'perfect-numbers)
-;;; perfect-numbers-test.el ends here
-
-#+end_src
-
 ** Phone Number
 Clean up user-entered phone numbers so that they can be sent SMS messages.
 #+begin_src shell
@@ -2419,63 +1126,6 @@ cd ${workspace}/${track}/phone-number
 emacs -batch -l ert -l phone-number-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/phone-number/phone-number-test.el
-;;; phone-number-test.el --- Tests for phone-number (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "phone-number.el")
-(declare-function numbers "phone-number.el" (num))
-(declare-function area-code "phone-number.el" (num))
-(declare-function pprint "phone-number.el" (num))
-
-(ert-deftest cleans-number-test ()
-  (should (equal (numbers "(123) 456-7890") "1234567890")))
-
-
-(ert-deftest cleans-numbers-with-dots-test ()
-  (should (equal (numbers "123.456.7890") "1234567890")))
-
-
-(ert-deftest valid-when-11-digits-and-first-is-1-test ()
-  (should (equal (numbers "11234567890") "1234567890")))
-
-
-(ert-deftest invalid-when-11-digits-test ()
-  (should (equal (numbers "21234567890") "0000000000")))
-
-
-(ert-deftest invalid-when-9-digits-test ()
-  (should (equal (numbers "123456789") "0000000000")))
-
-
-(ert-deftest invalid-with-letters ()
-  (should (equal (numbers "523-abc-7890") "0000000000")))
-
-
-(ert-deftest invalid-with-punctuations ()
-  (should (equal (numbers "523-@:!-7890") "0000000000")))
-
-
-(ert-deftest area-code-test ()
-  (should (equal (area-code "1234567890") "123")))
-
-
-(ert-deftest pprint-test ()
-  (should (equal (pprint "1234567890") "(123) 456-7890")))
-
-
-(ert-deftest pprint-full-us-phone-number-test ()
-  (should (equal (pprint "11234567890") "(123) 456-7890")))
-
-
-(provide 'phone-number)
-;;; phone-number-test.el ends here
-
-#+end_src
-
 ** Raindrops
 Convert a number to a string, the content of which depends on the number's factors.
 #+begin_src shell
@@ -2521,85 +1171,9 @@ cd ${workspace}/${track}/raindrops
 emacs -batch -l ert -l raindrops-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/raindrops/raindrops-test.el
-;;; raindrops-test.el --- Tests for Raindrops (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "raindrops.el")
-(declare-function convert "raindrops.el" (n))
-
-(ert-deftest test-1 ()
-  (should (equal "1"
-                 (convert 1))))
-
-(ert-deftest test-3 ()
-  (should (equal "Pling"
-                 (convert 3))))
-
-(ert-deftest test-5 ()
-  (should (equal "Plang"
-                 (convert 5))))
-
-(ert-deftest test-7 ()
-  (should (equal "Plong"
-                 (convert 7))))
-
-(ert-deftest test-6 ()
-  (should (equal "Pling"
-                 (convert 6))))
-
-(ert-deftest test-9 ()
-  (should (equal "Pling"
-                 (convert 9))))
-
-(ert-deftest test-10 ()
-  (should (equal "Plang"
-                 (convert 10))))
-
-(ert-deftest test-15 ()
-  (should (equal "PlingPlang"
-                 (convert 15))))
-
-(ert-deftest test-21 ()
-  (should (equal "PlingPlong"
-                 (convert 21))))
-
-(ert-deftest test-25 ()
-  (should (equal "Plang"
-                 (convert 25))))
-
-(ert-deftest test-35 ()
-  (should (equal "PlangPlong"
-                 (convert 35))))
-
-(ert-deftest test-49 ()
-  (should (equal "Plong"
-                 (convert 49))))
-
-(ert-deftest test-52 ()
-  (should (equal "52"
-                 (convert 52))))
-
-(ert-deftest test-105 ()
-  (should (equal "PlingPlangPlong"
-                 (convert 105))))
-
-(ert-deftest test-12121 ()
-  (should (equal "12121"
-                 (convert 12121))))
-
-(provide 'raindrops-test)
-;;; raindrops-test.el ends here
-
-#+end_src
-
 ** RNA Transcription
 Given a DNA strand, return its RNA Complement Transcription.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e rna-transcription
 #+end_src
@@ -2660,42 +1234,6 @@ cd ${workspace}/${track}/rna-transcription
 emacs -batch -l ert -l rna-transcription-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/rna-transcription/rna-transcription-test.el
-;;; rna-transcription-test.el --- Tests for RNA Transcription (exercism)
-
-;;; Commentary:
-
-
-;;; Code:
-
-(require 'cl-lib)
-
-(load-file "rna-transcription.el")
-
-(ert-deftest transcribes-cytosine-to-guanine ()
-  (should (string= "G" (to-rna "C"))))
-
-(ert-deftest transcribes-guanine-to-cytosine ()
-  (should (string= "C" (to-rna "G"))))
-
-(ert-deftest transcribes-adenine-to-uracil ()
-  (should (string= "U" (to-rna "A"))))
-
-(ert-deftest transcribes-thymine-to-adenine ()
-  (should (string= "A" (to-rna "T"))))
-
-(ert-deftest it-transcribes-all-nucleotides ()
-  (should (string= "UGCACCAGAAUU"
-                   (to-rna "ACGTGGTCTTAA"))))
-
-(ert-deftest it-validates-dna-strands ()
-  (should-error (to-rna "XCGFGGTDTTAA")))
-
-(provide 'rna-transcription-test)
-;;; rna-transcription-test.el ends here
-
-#+end_src
-
 ** Robot Name
 Manage robot factory settings.
 #+begin_src shell
@@ -2744,57 +1282,8 @@ cd ${workspace}/${track}/robot-name
 emacs -batch -l ert -l robot-name-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/robot-name/robot-name-test.el
-;;; robot-name-test.el --- Tests for Robot Name (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;; Ported pretty much directly from the xlisp version :)
-
-;;; Code:
-
-(require 'rx)
-
-(load-file "robot-name.el")
-(declare-function build-robot "robot-name.el")
-(declare-function robot-name "robot-name.el" (robot))
-(declare-function reset-robot "robot-name.el" (robot))
-
-(defvar *robbie* (build-robot))
-(defvar *clutz*  (build-robot))
-
-(defvar robot-name-re
-  (rx string-start
-      (= 2 upper-case)
-      (= 3 digit)
-      string-end))
-
-(ert-deftest name-matches-expected-pattern ()
-  (let ((name (robot-name *robbie*)))
-    (should (string-match-p robot-name-re name))))
-
-(ert-deftest name-is-persistent ()
-  "Test that robot name is persistent."
-  (should (equal (robot-name *robbie*) (robot-name *robbie*))))
-
-(ert-deftest different-robots-have-different-names ()
-  (should-not (equal (robot-name *robbie*) (robot-name *clutz*))))
-
-(ert-deftest name-can-be-reset ()
-  (let* ((robot (build-robot))
-         (original-name (robot-name robot)))
-    (reset-robot robot)
-    (should-not (equal original-name (robot-name robot)))))
-
-(provide 'robot-name-test)
-;;; robot-name-test.el ends here
-
-#+end_src
-
 ** Roman Numerals
 Write a function to convert from normal numbers to Roman Numerals.
-
-*** Start
 
 #+begin_src shell
 exercism download -t emacs-lisp -e roman-numerals
@@ -2835,101 +1324,6 @@ exercism download -t emacs-lisp -e roman-numerals
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/roman-numerals
 emacs -batch -l ert -l roman-numerals-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+RESULTS:
-:results:
-Loading ~/code/elisp/exercism/emacs-lisp/roman-numerals/roman-numerals.el (source)...
-Running 18 tests (2022-12-27 09:54:11+1100, selector ‘t’)
-   passed   1/18  to-roman-1 (0.000098 sec)
-   passed   2/18  to-roman-1024 (0.000061 sec)
-   passed   3/18  to-roman-141 (0.000054 sec)
-   passed   4/18  to-roman-163 (0.000071 sec)
-   passed   5/18  to-roman-2 (0.000070 sec)
-   passed   6/18  to-roman-27 (0.000059 sec)
-   passed   7/18  to-roman-3 (0.000038 sec)
-   passed   8/18  to-roman-3000 (0.000041 sec)
-   passed   9/18  to-roman-4 (0.000040 sec)
-   passed  10/18  to-roman-402 (0.000041 sec)
-   passed  11/18  to-roman-48 (0.000036 sec)
-   passed  12/18  to-roman-5 (0.000040 sec)
-   passed  13/18  to-roman-575 (0.000040 sec)
-   passed  14/18  to-roman-59 (0.000040 sec)
-   passed  15/18  to-roman-6 (0.000041 sec)
-   passed  16/18  to-roman-9 (0.000037 sec)
-   passed  17/18  to-roman-911 (0.000041 sec)
-   passed  18/18  to-roman-93 (0.000066 sec)
-
-Ran 18 tests, 18 results as expected, 0 unexpected (2022-12-27 09:54:11+1100, 0.001463 sec)
-
-:end:
-
-#+begin_src elisp :tangle exercism/emacs-lisp/roman-numerals/roman-numerals-test.el
-;;; roman-numerals-test.el --- Tests for roman-numerals (exercism)
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "roman-numerals.el")
-
-(ert-deftest to-roman-1 ()
-  (should (equal (to-roman 1) "I")))
-
-(ert-deftest to-roman-2 ()
-  (should (equal (to-roman 2) "II")))
-
-(ert-deftest to-roman-3 ()
-  (should (equal (to-roman 3) "III")))
-
-(ert-deftest to-roman-4 ()
-  (should (equal (to-roman 4) "IV")))
-
-(ert-deftest to-roman-5 ()
-  (should (equal (to-roman 5) "V")))
-
-(ert-deftest to-roman-6 ()
-  (should (equal (to-roman 6) "VI")))
-
-(ert-deftest to-roman-9 ()
-  (should (equal (to-roman 9) "IX")))
-
-(ert-deftest to-roman-27 ()
-  (should (equal (to-roman 27) "XXVII")))
-
-(ert-deftest to-roman-48 ()
-  (should (equal (to-roman 48) "XLVIII")))
-
-(ert-deftest to-roman-59 ()
-  (should (equal (to-roman 59) "LIX")))
-
-(ert-deftest to-roman-93 ()
-  (should (equal (to-roman 93) "XCIII")))
-
-(ert-deftest to-roman-141 ()
-  (should (equal (to-roman 141) "CXLI")))
-
-(ert-deftest to-roman-163 ()
-  (should (equal (to-roman 163) "CLXIII")))
-
-(ert-deftest to-roman-402 ()
-  (should (equal (to-roman 402) "CDII")))
-
-(ert-deftest to-roman-575 ()
-  (should (equal (to-roman 575) "DLXXV")))
-
-(ert-deftest to-roman-911 ()
-  (should (equal (to-roman 911) "CMXI")))
-
-(ert-deftest to-roman-1024 ()
-  (should (equal (to-roman 1024) "MXXIV")))
-
-(ert-deftest to-roman-3000 ()
-  (should (equal (to-roman 3000) "MMM")))
-
-(provide 'roman-numerals)
-;;; roman-numerals-test.el ends here
-
 #+end_src
 
 ** Run-Length Encoding
@@ -3000,77 +1394,9 @@ cd ${workspace}/${track}/run-length-encoding
 emacs -batch -l ert -l run-length-encoding-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/run-length-encoding/run-length-encoding-test.el
-;;; run-length-encoding-test.el --- Tests for run-length-encoding (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "run-length-encoding.el")
-(declare-function run-length-encode "run-length-encoding.el" (s))
-(declare-function run-length-decode "run-length-encoding.el" (s))
-
-(ert-deftest encode-empty-string ()
-  "encode an empty string"
-  (should (string= (run-length-encode "") "")))
-
-(ert-deftest encode-single-characters-without-count ()
-  "encode single characters without count"
-  (should (string= (run-length-encode "XYZ") "XYZ")))
-
-(ert-deftest encode-string-with-no-single-characters ()
-  "encode string with no single characters"
-  (should (string= (run-length-encode "AABBBCCCC") "2A3B4C")))
-
-(ert-deftest encode-string-with-single-and-mixed-characters ()
-  "encode string with single and mixed characters"
-  (should (string= (run-length-encode "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWB") "12WB12W3B24WB")))
-
-(ert-deftest encode-multiple-whitespace ()
-  "encode string with whitespace characters mixed in it"
-  (should (string= (run-length-encode "  hsqq qww  ") "2 hs2q q2w2 ")))
-
-(ert-deftest encode-lowercase ()
-  "encode string with lowercase characters"
-  (should (string= (run-length-encode "aabbbcccc") "2a3b4c")))
-
-(ert-deftest decode-empty-string ()
-  "decode empty string"
-  (should (string= (run-length-decode "") "")))
-
-(ert-deftest decode-single-characters ()
-  "decode string with single characters only"
-  (should (string= (run-length-decode "XYZ") "XYZ")))
-
-(ert-deftest decode-no-single-characters ()
-  "decode string with no single characters"
-  (should (string= (run-length-decode "2A3B4C") "AABBBCCCC")))
-
-(ert-deftest decode-single-and-repeated-characters ()
-  "decode string with single and repeated characters"
-  (should (string= (run-length-decode "12WB12W3B24WB") "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWB")))
-
-(ert-deftest decode-lowercase ()
-  "decode string with lowercase characters"
-  (should (string= (run-length-decode "2a3b4c") "aabbbcccc")))
-
-(ert-deftest decode-mixed-whitespace ()
-  "decode string with mixed whitespace characters in it"
-  (should (string= (run-length-decode "2 hs2q q2w2 ") "  hsqq qww  ")))
-
-(ert-deftest consistency ()
-  "Encode a string and then decode it. Should return the same one."
-  (should (string= (run-length-decode (run-length-encode "zzz ZZ  zZ")) "zzz ZZ  zZ")))
-
-;;; run-length-encoding-test.el ends here
-
-#+end_src
-
 ** Sublist
 Write a function to determine if a list is a sublist of another list.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e sublist
 #+end_src
@@ -3107,94 +1433,6 @@ exercism download -t emacs-lisp -e sublist
 #+begin_src shell :exports both :results output drawer :var workspace=exercism-workspace track=exercism-track
 cd ${workspace}/${track}/sublist
 emacs -batch -l ert -l sublist-test.el -f ert-run-tests-batch-and-exit 2>&1
-#+end_src
-
-#+begin_src elisp :tangle exercism/emacs-lisp/sublist/sublist-test.el
-;;; sublist-test.el --- Tests for Sublist (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "sublist.el")
-(declare-function list-classify "sublist.el" (list1 list2))
-
-
-(ert-deftest empty-lists ()
-  (should (equal :equal (list-classify '() '()))))
-
-
-(ert-deftest empty-list-within-non-empty-list ()
-  (should (equal :sublist (list-classify '() '(1 2 3)))))
-
-
-(ert-deftest non-empty-list-contains-empty-list ()
-  (should (equal :superlist (list-classify '(1 2 3) '()))))
-
-
-(ert-deftest list-equals-itself ()
-  (should (equal :equal (list-classify '(1 2 3) '(1 2 3)))))
-
-
-(ert-deftest different-lists ()
-  (should (equal :unequal (list-classify '(1 2 3) '(2 3 4)))))
-
-
-(ert-deftest false-start ()
-  (should (equal :sublist (list-classify '(1 2 5) '(0 1 2 3 1 2 5 6)))))
-
-
-(ert-deftest consecutive ()
-  (should (equal :sublist (list-classify '(1 1 2) '(0 1 1 1 2 1 2)))))
-
-
-(ert-deftest sublist-at-start ()
-  (should (equal :sublist (list-classify '(0 1 2) '(0 1 2 3 4 5)))))
-
-
-(ert-deftest sublist-in-middle ()
-  (should (equal :sublist (list-classify '(2 3 4) '(0 1 2 3 4 5)))))
-
-
-(ert-deftest sublist-at-end ()
-  (should (equal :sublist (list-classify '(3 4 5) '(0 1 2 3 4 5)))))
-
-
-(ert-deftest at-start-of-superlist ()
-  (should (equal :superlist (list-classify '(0 1 2 3 4 5) '(0 1 2)))))
-
-
-(ert-deftest in-middle-of-superlist ()
-  (should (equal :superlist (list-classify '(0 1 2 3 4 5) '(2 3)))))
-
-
-(ert-deftest at-end-of-superlist ()
-  (should (equal :superlist (list-classify '(0 1 2 3 4 5) '(3 4 5)))))
-
-
-(ert-deftest first-list-missing-element-from-second-list ()
-  (should (equal :unequal (list-classify '(1 3) '(1 2 3)))))
-
-
-(ert-deftest second-list-missing-element-from-first-list ()
-  (should (equal :unequal (list-classify '(1 2 3) '(1 3)))))
-
-
-(ert-deftest first-list-missing-additional-digits-from-second-list ()
-  (should (equal :unequal (list-classify '(1 2) '(1 22)))))
-
-
-(ert-deftest order-matters-to-a-list ()
-  (should (equal :unequal (list-classify '(1 2 3) '(3 2 1)))))
-
-
-(ert-deftest same-digits-but-different-numbers ()
-  (should (equal :unequal (list-classify '(1 0 1) '(10 1)))))
-
-
-(provide 'sublist-test)
-;;; sublist-test.el ends here
-
 #+end_src
 
 ** Trinary
@@ -3237,55 +1475,9 @@ cd ${workspace}/${track}/trinary
 emacs -batch -l ert -l trinary-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+begin_src elisp :tangle exercism/emacs-lisp/trinary/trinary-test.el
-;;; trinary-test.el --- Tests for Trinary (exercism)  -*- lexical-binding: t; -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "trinary.el")
-(declare-function trinary-to-decimal "trinary.el" (string))
-
-(ert-deftest trinary-1-is-decimal-1 ()
-  (should (= 1 (trinary-to-decimal "1"))))
-
-(ert-deftest trinary-2-is-decimal-2 ()
-  (should (= 2 (trinary-to-decimal "2"))))
-
-(ert-deftest trinary-10-is-decimal-3 ()
-  (should (= 3 (trinary-to-decimal "10"))))
-
-(ert-deftest trinary-11-is-decimal-4 ()
-  (should (= 4 (trinary-to-decimal "11"))))
-
-(ert-deftest trinary-100-is-decimal-9 ()
-  (should (= 9 (trinary-to-decimal "100"))))
-
-(ert-deftest trinary-112-is-decimal-14 ()
-  (should (= 14 (trinary-to-decimal "112"))))
-
-(ert-deftest trinary-222-is-decimal-26 ()
-  (should (= 26 (trinary-to-decimal "222"))))
-
-(ert-deftest trinary-1122000120-is-decimal-32091 ()
-  (should (= 32091 (trinary-to-decimal "1122000120"))))
-
-(ert-deftest invalid-input-is-decimal-0 ()
-  (should (= 0 (trinary-to-decimal "carrot"))))
-
-(ert-deftest invalid-input-with-digits-is-decimal-0 ()
-  (should (= 0 (trinary-to-decimal "0a1b2c"))))
-
-(provide 'trinary-test)
-;;; trinary-test.el ends here
-
-#+end_src
-
 ** Two Fer
 Create a sentence of the form One for X, one for me..
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e two-fer
 #+end_src
@@ -3319,49 +1511,9 @@ cd ${workspace}/${track}/two-fer
 emacs -batch -l ert -l two-fer-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
 
-#+RESULTS:
-:results:
-Loading ~/code/elisp/exercism/emacs-lisp/two-fer/two-fer.el (source)...
-Running 3 tests (2022-12-27 10:21:30+1100, selector ‘t’)
-   passed  1/3  a-name-given (0.000108 sec)
-   passed  2/3  another-name-given (0.000061 sec)
-   passed  3/3  no-name-given (0.000051 sec)
-
-Ran 3 tests, 3 results as expected, 0 unexpected (2022-12-27 10:21:30+1100, 0.000398 sec)
-
-:end:
-
-
-#+begin_src elisp :tangle exercism/emacs-lisp/two-fer/two-fer-test.el
-
-;;; two-fer-test.el --- Tests for Two-fer (exercism)
-
-;;; Commentary:
-;; Common test data version: 1.2.0 4fc1acb
-
-;;; Code:
-
-(load-file "two-fer.el")
-
-(ert-deftest no-name-given ()
-  (should (string= (two-fer) "One for you, one for me.")))
-
-(ert-deftest a-name-given ()
-  (should (string= (two-fer "Alice") "One for Alice, one for me.")))
-
-(ert-deftest another-name-given ()
-  (should (string= (two-fer "Bob") "One for Bob, one for me.")))
-
-(provide 'two-fer-test)
-
-;;; two-fer-test.el ends here
-
-#+end_src
-
 ** Word Count
 Given a phrase, count the occurrences of each word in that phrase.
 
-*** Start
 #+begin_src shell
 exercism download -t emacs-lisp -e word-count
 #+end_src
@@ -3403,89 +1555,3 @@ exercism download -t emacs-lisp -e word-count
 cd ${workspace}/${track}/word-count
 emacs -batch -l ert -l word-count-test.el -f ert-run-tests-batch-and-exit 2>&1
 #+end_src
-
-#+begin_src elisp :tangle exercism/emacs-lisp/word-count/word-count-test.el
-;;; word-count-test.el --- Tests for word-count (exercism)
-
-;;; Commentary:
-
-;;; Code:
-
-(load-file "word-count.el")
-
-
-(defun equal-assoc (a b)
-  (let ((strcmp (lambda (a b) (not (string< (car a) (car b))))))
-    (equal (sort (copy-sequence a) strcmp)
-           (sort (copy-sequence b) strcmp))))
-
-
-(ert-deftest no-words-test ()
-  (should (equal-assoc (word-count "")
-                       nil)))
-
-
-(ert-deftest count-one-word-test ()
-  (should (equal-assoc (word-count "word")
-                       '(("word" . 1)))))
-
-
-(ert-deftest count-one-of-each-word-test ()
-  (should (equal-assoc (word-count "one of each")
-                       '(("each" . 1)
-                         ("of" . 1)
-                         ("one" . 1)))))
-
-
-(ert-deftest multiple-occurrences-of-a-word-test ()
-  (should (equal-assoc (word-count "one fish two fish red fish blue fish")
-                       '(("blue" . 1)
-                         ("red" . 1)
-                         ("two" . 1)
-                         ("fish" . 4)
-                         ("one" . 1)))))
-
-
-(ert-deftest ignore-punctuation-test ()
-  (should (equal-assoc (word-count "car : carpet as java : javascript!!&@$%^&")
-                       '(("javascript" . 1)
-                         ("java" . 1)
-                         ("as" . 1)
-                         ("carpet" . 1)
-                         ("car" . 1)))))
-
-
-(ert-deftest include-numbers-test ()
-  (should (equal-assoc (word-count "testing, 1, 2 testing")
-                       '(("2" . 1)
-                         ("1" . 1)
-                         ("testing" . 2)))))
-
-
-(ert-deftest normalize-case-test ()
-  (should (equal-assoc (word-count "go Go GO Stop stop")
-                       '(("stop" . 2)
-                         ("go" . 3)))))
-
-
-(ert-deftest with-apostrophes-test ()
-  (should (equal-assoc (word-count "First: don't laugh. Then: don't cry. You're getting it.")
-                       '(("first" . 1)
-                         ("don't" . 2)
-                         ("laugh" . 1)
-                         ("then" . 1)
-                         ("cry" . 1)
-                         ("you're" . 1)
-                         ("getting" . 1)
-                         ("it" . 1)))))
-
-(ert-deftest quotation-for-word-with-apostrophe-test ()
-  (should (equal-assoc (word-count "can, can't, 'can't''")
-                       '(("can" . 1)
-                         ("can't" . 2)))))
-
-(provide 'word-count)
-;;; word-count-test.el ends here
-
-#+end_src
-
