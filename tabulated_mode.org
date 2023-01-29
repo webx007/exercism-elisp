@@ -1,0 +1,191 @@
+#+TITLE: Emacs Tabulated Major Mode Usage
+#+OPTIONS: ^:{}
+
+
+
+* Basic Example
+:PROPERTIES:
+:header-args:elisp: :tangle yes my-tab-mode.el
+:END:
+
+
+#+begin_src elisp
+;; -*- lexical-binding: t; -*-
+
+
+(cl-defstruct (cx1-session (:constructor cx1-session--create)
+                           (:copier nil))
+  tenantid issuer (token "") (exiry 0) (endpoints '(:token "" :auth "" :api "")))
+
+
+
+
+(cl-defun cx1-session-create (&rest args)
+  (apply #'cx1-session--create args))
+
+;;11e903cc-b207-ad10-90f8-0242ac110006
+(defun cx1-discover (session)
+  (let ((path-openid "/.well-known/openid-configuration")
+        (path-cxone "/.well-known/cxone-configuration")
+        (method "GET")
+        (uri)
+        (rbody))
+    (setq uri (concat "https://" (cx1-session-issuer session) path-openid))
+    ;;(message uri)
+    (with-current-buffer
+      (url-retrieve-synchronously uri)
+      (goto-char (+ 1 url-http-end-of-headers))
+      (setq rbody (json-read-object))
+      ;;(pp rbody)
+      (plist-put (cx1-session-endpoints session)
+                 :token
+                 (cdr (assoc 'token_endpoint rbody))))
+    (setq uri (concat "https://"
+                      (cx1-session-issuer session)
+                      path-cxone "?tenantId="
+                      (cx1-session-tenantid session)))
+    (with-current-buffer
+      (url-retrieve-synchronously uri)
+      (goto-char (+ 1 url-http-end-of-headers))
+      (setq rbody (json-read-object))
+      ;;(pp rbody)
+      (plist-put (cx1-session-endpoints session)
+                 :api
+                 (assoc 'api_endpoint rbody))
+      (plist-put (cx1-session-endpoints session)
+                 :auth
+                 (assoc 'auth_endpoint rbody)))))
+
+(defun cx1-authenticate (session client-id client-secret username password)
+  (let (auth-header uri)
+    (setq auth-header (concat "Basic "
+                              (base64-encode-string (concat (url-hexify-string client-id)
+                                                            ":"
+                                                            (url-hexify-string client-secret))
+                                                    t)))
+    (setq uri (plist-get (cx1-session-endpoints session) :token))
+    (let ((url-request-method "POST")
+	        (url-request-extra-headers (list (cons "Content-Type" "application/x-www-form-urlencoded")
+                                       (cons "Authorization" auth-header)))
+	        (url-request-data (format "grant_type=password&username=%s&password=%s"
+                                    (url-hexify-string username)
+                                    (url-hexify-string password)))
+          rbody)
+      (with-current-buffer (url-retrieve-synchronously uri)
+        (goto-char (+ 1 url-http-end-of-headers))
+        (setq rbody (json-read-object))
+        (pp rbody)
+        (setf (cx1-session-token session) (cdr (assoc 'access_token rbody)))
+        (setf (cx1-session-exiry session) (+ (float-time)
+                                             (cdr (assoc 'expires_in rbody))))))))
+
+;; mode map
+(defvar my-tab-mode-map
+  (let ((kmap (make-sparse-keymap)))
+    (define-key kmap (kbd "f") 'my-tab--get-entries)
+    (define-key kmap (kbd "m") 'my-tab--toggle-selected)
+    (define-key kmap (kbd "C-c c") 'my-tab--configure)
+    (define-key kmap (kbd "C-c m") 'my-tab--unselect-all)
+    kmap)
+  "Keymap for `my-tab-mode'")
+
+(defun my-tab--configure ()
+  "Prompt the user for the pass store entity and key"
+  (interactive)
+  (if (and auth-source-pass-filename
+           (file-directory-p auth-source-pass-filename))
+      (let ((my-list)
+            (my-key))
+        (setq my-list (mapcar (lambda (x)
+                                (replace-regexp-in-string
+                                 (concat ".*" auth-source-pass-filename ".")
+                                 ""
+                                 (string-remove-suffix ".gpg" x)))
+                              (directory-files-recursively
+                               (file-name-concat auth-source-pass-filename "cxone")
+                               ".*gpg"
+                               nil)))
+        
+        (if (not my-list)
+            (message "no entries found in the password store")
+          (setq my-key (ido-completing-read "Select CXone API Key:" my-list))
+          (when (stringp my-key)
+            (setq my-tab--credentials my-key))))
+    (message "auth-source unix password store (pass) not configured")))
+
+(defun my-tab--authenticate ()
+  (if )
+  )
+
+(defun my-tab--toggle-selected ()
+  "Select/Unselect item under cursor"
+  (interactive)
+  (let ((eid (tabulated-list-get-id)))
+    (if (member eid my-tab--items-selected)
+        (progn
+          (tabulated-list-put-tag " ")
+          (setq my-tab--items-selected (delete eid my-tab--items-selected)))
+      (if my-tab--items-selected
+          (setq my-tab--items-selected (nconc my-tab--items-selected (list eid)))
+        (setq my-tab--items-selected (list eid)))
+      (tabulated-list-put-tag "*" t))))
+
+(defun my-tab--unselect-all ()
+  "Unselect all entries"
+  (interactive)
+  (setq my-tab--items-selected '())
+  (tabulated-list-clear-all-tags))
+
+(defun my-tab--get-entries ()
+  (interactive)
+  (setq tabulated-list-entries (list
+                                (list "1" ["CheckPorts" "Phone" "" "2023-02-01"])
+                                (list "2" ["Inbound" "Phone" "Dev\\" "2022-12-04"])
+                                (list "3" ["Outbound" "Phone" "Prod\\" "2023-01-12"])))
+  (setq my-tab--items-selected (list))
+  (tabulated-list-print t))
+
+(define-derived-mode my-tab-mode tabulated-list-mode "my-tab-mode"
+  "Major mode for tabulated list example."
+  (use-local-map my-tab-mode-map)
+  (setq tabulated-list-format [("Name" 10 t)
+                               ("Type" 10 nil)
+                               ("Path"  10 t)
+                               ("Date" 0 nil)]);; last columnt takes what left
+
+  (setq tabulated-list-padding 4)
+  (setq tabulated-list-sort-key (cons "Name" nil))
+  (tabulated-list-init-header)
+  (tabulated-list-print t)
+  (make-local-variable 'my-tab--token)
+  (make-local-variable 'my-tab--items)
+  (make-local-variable 'my-tab--items-selected)
+  (setq my-tab--token '())
+  (setq my-tab--items-selected '()))
+
+(defun test-my-mode ()
+  (interactive)
+  (let* ((bn "*My-Test-Tab*")
+         (b (get-buffer bn)))
+    (unless b
+      (setq my-tab--items-selected nil)
+      (setq b (get-buffer-create bn))
+      (with-current-buffer b
+        (my-tab-mode))
+      (pop-to-buffer-same-window b))))
+#+end_src
+
+Testing authentication
+#+begin_src elisp :tangle no
+(let (s)
+  (setq s (cx1-session--create :tenantid "11e903cc-b207-ad10-90f8-0242ac110006" :issuer "cxone.niceincontact.com"))
+  (message (cx1-session-issuer s))
+  (cx1-discover s)
+  (setq url-debug t)
+  (cx1-authenticate s
+                    (auth-source-pass-get "Username" "cxone/a32/cpa/api-key")
+                    (auth-source-pass-get 'secret "cxone/a32/cpa/api-key")
+                    (auth-source-pass-get "Username" "cxone/a32/servicesa32/access-keys/tx5a")
+                    (auth-source-pass-get 'secret "cxone/a32/servicesa32/access-keys/tx5a"))
+#+end_src
+** 
